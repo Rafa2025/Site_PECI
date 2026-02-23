@@ -286,14 +286,10 @@
 
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1px;
       background: var(--border);
       border: 1px solid var(--border);
-    }
-    .features-grid .feature-card:nth-child(5),
-   .features-grid .feature-card:nth-child(6) {
-    grid-column: span 2;
     }
     .feature-card {
       background: var(--bg2);
@@ -671,6 +667,21 @@
         <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
         <h3>Arquitetura Desacoplada</h3>
         <p>Separação entre recolha de dados e visualização, permitindo a troca dinâmica de componentes de infraestrutura sem downtime.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        </svg>
+        <h3>Placeholder 01</h3>
+        <p>Conteúdo temporário para validar layout 4x2. Será substituído por nova funcionalidade.</p>
+      </div>
+
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="8"/>
+        </svg>
+        <h3>Placeholder 02</h3>
+        <p>Bloco provisório apenas para verificar alinhamento, espaçamento e simetria da grelha.</p>
       </div>
     </div>
 
