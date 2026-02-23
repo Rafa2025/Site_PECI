@@ -319,16 +319,33 @@
     }
     .stack-col { background: var(--bg2); padding: 1.8rem; }
     .stack-col h4 {
-      font-family: var(--display);
-      font-size: .78rem;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-      padding-bottom: .6rem;
-      border-bottom: 1px solid var(--border);
-    }
+  font-family: var(--display);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+
+  /* Centrar o título e fazer o sublinhado acompanhar o texto */
+  text-align: center;
+  border-bottom: none;                        /* remove o border-bottom global */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+}
+
+/* Sublinhado que acompanha só o texto */
+.stack-col h4::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  align-self: stretch;   /* ocupa a largura da coluna — linha full-width sob o título centrado */
+}
     .stack-col ul { list-style: none; }
     .stack-col li {
       font-size: .8rem;
