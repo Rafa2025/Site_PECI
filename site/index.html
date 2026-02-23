@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitorização e Controlo de Datacenters Dinâmicos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav>
+    <a class="logo" href="#"><span>//</span> PECI</a>
+    <ul>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#stack">Tecnologia</a></li>
+      <li><a href="#publicacoes">Publicações</a></li>
+      <li><a href="#media">Media</a></li>
+      <li><a href="#equipa">Equipa</a></li>
+      <li>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">
+          <!-- Moon icon (visible in dark mode) -->
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <!-- Sun icon (visible in light mode) -->
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-orb2"></div>
+    <div class="tag">Projeto de Engenharia de Computadores e Informática · Universidade de Aveiro</div>
+    <h1>Monitorização &<br><em>Controlo</em> de<br>Datacenters Dinâmicos</h1>
+    <p class="hero-sub">
+      Desenvolvimento de uma ferramenta de monitorização dinâmica capaz de se adaptar automaticamente às mudanças da infraestrutura — integrando observabilidade adaptativa, injeção de falhas e análise inteligente com recurso a Machine Learning.
+    </p>
+    <div class="btn-row">
+      <a href="#publicacoes" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Publicações
+      </a>
+      <a href="#sobre" class="btn btn-ghost">Saber Mais →</a>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-val">3</span>
+      <span class="stat-label">Componentes</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">3</span>
+      <span class="stat-label">Projetos EU</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">5</span>
+      <span class="stat-label">Elementos</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val">UA</span>
+      <span class="stat-label">Universidade de Aveiro</span>
+    </div>
+  </div>
+
+  <!-- SOBRE -->
+  <section id="sobre">
+    <div class="reveal">
+      <p class="section-label">// Visão Geral</p>
+      <h2>O Que Estamos a Construir</h2>
+      <p class="section-desc">
+        A provisão moderna de serviços assenta em computação distribuída e redes complexas dentro de datacenters. Garantir que um serviço sobrevive a falhas de hardware, picos de tráfego e quedas de conectividade é um desafio central para o engenheiro de computadores de hoje.
+      </p>
+    </div>
+
+    <div class="desc-block reveal">
+      Este projeto propõe a elaboração de uma <strong>Ferramenta de Monitorização Dinâmica</strong> que se adapta automaticamente às condições em mudança da infraestrutura, sem necessidade de reescritas de código. A ferramenta recolhe informação de monitorização adequada a avaliar e melhorar as operações dos serviços em execução no datacenter. Executa simultaneamente <strong>testes de injeção de falhas e stress</strong>, e analisa automaticamente os dados obtidos. O sistema aborda três componentes distintas: <strong>observabilidade dinâmica</strong>, <strong>injeção de falhas</strong> e <strong>análise inteligente</strong>.
+    </div>
+
+    <div class="components-grid reveal">
+      <div class="comp-card">
+        <div class="comp-num">01</div>
+        <h3>Observabilidade Dinâmica</h3>
+        <p>Recolha contínua e adaptativa de métricas de serviço, recursos e rede — sem reconfiguração manual quando a infraestrutura evolui. Suporta troca dinâmica de componentes, desacoplando a recolha de dados da visualização.</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-num">02</div>
+        <h3>Injeção de Falhas & Stress</h3>
+        <p>Testes controlados de robustez e resiliência usando chaos engineering, perturbações de rede e geração de tráfego, para validar o comportamento dos serviços em condições adversas e identificar casos de uso críticos.</p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-num">03</div>
+        <h3>Análise Inteligente</h3>
+        <p>Uso de técnicas de Machine Learning e LLMs (Llama, Mistral, Deepseek) para correlacionar dados, detetar anomalias, gerar relatórios automáticos e identificar a causa raiz de problemas de desempenho.</p>
+      </div>
+    </div>
+
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        <h3>Monitorização em Tempo Real</h3>
+        <p>Observação contínua de métricas de serviço, utilização de recursos e desempenho em nós distribuídos do datacenter via Prometheus e NetData.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <h3>Controlo Adaptativo</h3>
+        <p>Ajuste dinâmico de alocação de recursos em resposta a variações de carga, com API de controlo exposta via FastAPI.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        <h3>Eficiência Energética</h3>
+        <p>Minimização do consumo energético com gestão preditiva de recursos e métricas de energia através de Scaphandre e Kepler.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <h3>Garantia de SLA</h3>
+        <p>Deteção proativa e mitigação de violações de SLA através de monitorização contínua de limiares e protocolos de resposta automatizados.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h3>Deteção de Anomalias</h3>
+        <p>Identificação assistida por ML de padrões anómalos usando TensorFlow/PyTorch antes de escalarem para disrupções de serviço.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <h3>Arquitetura Desacoplada</h3>
+        <p>Separação entre recolha de dados e visualização, permitindo a troca dinâmica de componentes de infraestrutura sem downtime.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+        </svg>
+        <h3>Placeholder 01</h3>
+        <p>Conteúdo temporário para validar layout 4x2. Será substituído por nova funcionalidade.</p>
+      </div>
+      <div class="feature-card">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="8"/>
+        </svg>
+        <h3>Placeholder 02</h3>
+        <p>Bloco provisório apenas para verificar alinhamento, espaçamento e simetria da grelha.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:4rem" class="reveal">
+      <p class="section-label" style="margin-bottom:1rem">// Contexto Internacional</p>
+      <h2 style="margin-bottom:.6rem">Projetos Europeus Associados</h2>
+      <p class="section-desc">Este projeto trabalha com infraestrutura de ponta atualmente utilizada em grandes projetos europeus de investigação.</p>
+      <div class="projects-row">
+        <a class="project-badge" href="https://imagineb5g.eu/" target="_blank">
+          <span class="project-badge-name">IMAGINE-B5G</span>
+          <span class="project-badge-desc">Plataforma de experimentação para redes além do 5G</span>
+          <span class="project-badge-link">imagineb5g.eu ↗</span>
+        </a>
+        <a class="project-badge" href="https://projectexigence.eu/" target="_blank">
+          <span class="project-badge-name">EXIGENCE</span>
+          <span class="project-badge-desc">Infraestruturas de computação de ponta resilientes e eficientes</span>
+          <span class="project-badge-link">projectexigence.eu ↗</span>
+        </a>
+        <a class="project-badge" href="https://6g-versus.eu/" target="_blank">
+          <span class="project-badge-name">6G-VERSUS</span>
+          <span class="project-badge-desc">Investigação e validação de redes 6G</span>
+          <span class="project-badge-link">6g-versus.eu ↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK -->
+  <section id="stack">
+    <div class="reveal">
+      <p class="section-label">// Stack Tecnológico</p>
+      <h2>Ferramentas & Tecnologias</h2>
+      <p class="section-desc">Conjunto de tecnologias open-source recomendadas no enunciado do projeto e consideradas para a futura implementação da prova de conceito.</p>
+    </div>
+    <div class="stack-grid reveal">
+      <div class="stack-col">
+        <h4>Automação</h4>
+        <ul>
+          <li>Python / Bash</li>
+          <li>Ansible</li>
+          <li>FastAPI</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>IA & Análise</h4>
+        <ul>
+          <li>TensorFlow / PyTorch</li>
+          <li>Llama / Mistral</li>
+          <li>Deepseek</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>Observabilidade</h4>
+        <ul>
+          <li>Prometheus</li>
+          <li>Node Exporter</li>
+          <li>Grafana / Loki / Tempo</li>
+          <li>NetData</li>
+          <li>Scaphandre / Kepler</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>Rede</h4>
+        <ul>
+          <li>IPFIX / NETFLOW</li>
+          <li>Zeek</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>Chaos Engineering</h4>
+        <ul>
+          <li>ChaosMesh</li>
+          <li>Linux tc / netem</li>
+          <li>Iperf3 / Locust</li>
+          <li>DeathStarBench</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>Infraestrutura</h4>
+        <ul>
+          <li>Docker</li>
+          <li>Kubernetes</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICAÇÕES -->
+  <section id="publicacoes">
+    <div class="reveal">
+      <p class="section-label">// Publicações & Documentos</p>
+      <h2>Resultados de Investigação</h2>
+      <p class="section-desc">
+        Apresentações, relatórios técnicos e documentação produzidos ao longo do projeto.
+      </p>
+    </div>
+    <div class="pub-list reveal">
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Descrição do Projeto</span>
+          <span class="pub-title">Monitorização e Controlo de Desempenho em Datacenters Dinâmicos</span>
+          <span class="pub-date">2026</span>
+        </div>
+        <a href="docs/01 _ Better Monitoring in datacenters.pdf" class="pub-link" download>Download →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Apresentação</span>
+          <span class="pub-title">Inception</span>
+          <span class="pub-date">Em breve</span>
+        </div>
+        <a href="#" class="pub-link">Ver →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Relatório Técnico</span>
+          <span class="pub-title">Monitorização em Datacenters</span>
+          <span class="pub-date">Em breve</span>
+        </div>
+        <a href="#" class="pub-link">Download →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEDIA -->
+  <section id="media">
+    <div class="reveal">
+      <p class="section-label">// Media</p>
+      <h2>Imagens & Vídeos</h2>
+      <p class="section-desc">
+        Documentação visual do projeto, incluindo capturas de ecrã e apresentações gravadas.
+      </p>
+    </div>
+    <div class="media-grid reveal">
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/img1.png">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/img2.png">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <video src="media/video.mp4"></video>
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <div class="media-placeholder">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <span>Vídeo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EQUIPA -->
+  <section id="equipa">
+    <div class="reveal">
+      <p class="section-label">// Equipa</p>
+      <h2>Equipa do Projeto</h2>
+    </div>
+    <div class="team-section reveal">
+      <div>
+        <p class="team-group-label">Orientadores</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">DC</div>
+            <div class="team-info">
+              <span class="team-name">Daniel Corujo</span>
+              <span class="team-role">Professor · Orientador</span>
+              <a class="team-email" href="mailto:dcorujo@ua.pt">dcorujo@ua.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">RA</div>
+            <div class="team-info">
+              <span class="team-name">Rui Luís Aguiar</span>
+              <span class="team-role">Professor · Orientador</span>
+              <a class="team-email" href="mailto:ruilaa@ua.pt">ruilaa@ua.pt</a>
+            </div>
+          </div>
+        </div>
+        <p class="team-group-label">Contribuidores</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">AC</div>
+            <div class="team-info">
+              <span class="team-name">Alisson Chaves</span>
+              <span class="team-role">Contribuidor</span>
+               <a class="team-email" href="mailto:aoc.alisson@av.it.pt">aoc.alisson@av.it.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">DS</div>
+            <div class="team-info">
+              <span class="team-name">David Santos</span>
+              <span class="team-role">Contribuidor</span>
+                <a class="team-email" href="mailto:davidsantos@av.it.pt">davidsantos@av.it.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">TB</div>
+            <div class="team-info">
+              <span class="team-name">Tiago Barros</span>
+              <span class="team-role">Contribuidor</span>
+              <a class="team-email" href="mailto:tiagobarros@av.it.pt">tiagobarros@av.it.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">RS</div>
+            <div class="team-info">
+              <span class="team-name">Rui Silva</span>
+              <span class="team-role">Contribuidor</span>
+              <a class="team-email" href="mailto:ruimiguelsilva@av.it.pt">ruimiguelsilva@av.it.pt</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="team-group-label">Grupo de Estudantes</p>
+        <div class="team-grid">
+          <div class="team-card">
+            <div class="team-avatar">RF</div>
+            <div class="team-info">
+              <span class="team-name">Rafael Ferreira</span>
+              <span class="team-role">Aluno de LECI</span>
+              <a class="team-email" href="mailto:rafaelmferreira0@ua.pt">rafaelmferreira0@ua.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">AR</div>
+            <div class="team-info">
+              <span class="team-name">Adriana Rocha</span>
+              <span class="team-role">Aluna de LECI</span>
+              <a class="team-email" href="mailto:adrianarocha@ua.pt">adrianarocha@ua.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">AS</div>
+            <div class="team-info">
+              <span class="team-name">André Silva</span>
+              <span class="team-role">Aluno de LECI</span>
+              <a class="team-email" href="mailto:andre.castelhanos@ua.pt">andre.castelhanos@ua.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">DO</div>
+            <div class="team-info">
+              <span class="team-name">Dinis Oliveira</span>
+              <span class="team-role">Aluno de LECI</span>
+              <a class="team-email" href="mailto:dinis.oliveira@ua.pt">dinis.oliveira@ua.pt</a>
+            </div>
+          </div>
+          <div class="team-card">
+            <div class="team-avatar">GG</div>
+            <div class="team-info">
+              <span class="team-name">Guilherme Goulart</span>
+              <span class="team-role">Aluno de LECI</span>
+              <a class="team-email" href="mailto:guilhermegoulart@ua.pt">guilhermegoulart@ua.pt</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 PECI · Universidade de Aveiro. Todos os direitos reservados.</p>
+    <p>Monitorização e Controlo de Desempenho em Datacenters Dinâmicos</p>
+  </footer>
+
+  <div id="imageModal" class="modal">
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <img id="modalImg" style="display:none;">
+    <video id="modalVideo" controls style="display:none; max-width:90%; max-height:90%;"></video>
+  </div>
+
+  <script>
+    /* ─── THEME TOGGLE ─── */
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isLight = html.getAttribute('data-theme') === 'light';
+      html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+      localStorage.setItem('theme', isLight ? 'dark' : 'light');
+    }
+
+    /* Restore saved preference on load */
+    (function () {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+
+    /* ─── SCROLL REVEAL ─── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    document.querySelectorAll('.features-grid, .pub-list, .media-grid, .stack-grid, .components-grid, .projects-row, .team-grid').forEach(parent => {
+      [...parent.children].forEach((child, i) => {
+        child.style.transitionDelay = `${i * 60}ms`;
+      });
+    });
+
+    /* ─── MODAL ─── */
+    function openModal(card) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      const modalVideo = document.getElementById('modalVideo');
+
+      const img = card.querySelector('img');
+      const video = card.querySelector('video');
+
+      modalImg.style.display = 'none';
+      modalVideo.style.display = 'none';
+      modalVideo.pause();
+      modalVideo.src = '';
+
+      if (img) {
+        modalImg.src = img.src;
+        modalImg.style.display = 'block';
+      }
+      if (video) {
+        modalVideo.src = video.src;
+        modalVideo.style.display = 'block';
+        modalVideo.play();
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('imageModal');
+      const modalVideo = document.getElementById('modalVideo');
+      modal.style.display = 'none';
+      modalVideo.pause();
+    }
+  </script>
+</body>
+</html>
