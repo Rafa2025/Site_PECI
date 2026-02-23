@@ -154,7 +154,7 @@
           <circle cx="12" cy="12" r="9"/>
           <path d="M12 8v4l3 3"/>
         </svg>
-        <h3>MVP – Prova de Conceito Inicial</h3>
+        <h3 onclick="openMedia('media/not_a_lebron_edit.mp4')">MVP – Prova de Conceito Inicial</h3>
         <p>Sistema funcional capaz de monitorizar CPU, memória e rede em múltiplos nós, executar um teste de stress controlado e correlacionar automaticamente o impacto nos recursos.</p>
       </div>  
     </div>
@@ -492,6 +492,30 @@
       const modalVideo = document.getElementById('modalVideo');
       modal.style.display = 'none';
       modalVideo.pause();
+    }
+
+    function openMedia(src) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImg');
+      const modalVideo = document.getElementById('modalVideo');
+
+      // Reset
+      modalImg.style.display = 'none';
+      modalVideo.style.display = 'none';
+      modalVideo.pause();
+      modalVideo.src = '';
+
+      // Detect type by extension
+      if (src.match(/\.(mp4|webm|ogg)$/i)) {
+        modalVideo.src = src;
+        modalVideo.style.display = 'block';
+        modalVideo.play();
+      } else {
+        modalImg.src = src;
+        modalImg.style.display = 'block';
+      }
+
+      modal.style.display = 'flex';
     }
   </script>
 </body>
