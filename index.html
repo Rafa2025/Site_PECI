@@ -1,41 +1,352 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Monitorização e Controlo de Datacenters Dinâmicos</title>
+  <title>Modular Monitoring & Performance Benchmarking in Virtualised Infrastructures</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: #2a2a38;
+      --text: #e8e8f0;
+      --text-muted: #7a7a9a;
+      --accent: #6c6cff;
+      --accent2: #00e5b0;
+      --accent3: #ff6c6c;
+      --mono: 'DM Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #f4f4f8;
+      --surface: #ffffff;
+      --surface2: #eeeef6;
+      --border: #d0d0e0;
+      --text: #111118;
+      --text-muted: #5a5a7a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    [data-theme="light"] nav { background: rgba(244,244,248,0.85); }
+
+    .logo { font-family: var(--mono); font-size: .9rem; color: var(--accent2); text-decoration: none; letter-spacing: .05em; }
+    .logo span { color: var(--accent); }
+
+    nav ul { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    nav ul a { font-family: var(--mono); font-size: .78rem; color: var(--text-muted); text-decoration: none; letter-spacing: .06em; text-transform: uppercase; transition: color .2s; }
+    nav ul a:hover { color: var(--text); }
+
+    .theme-toggle {
+      background: none; border: 1px solid var(--border); color: var(--text-muted);
+      width: 2rem; height: 2rem; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all .2s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .icon-sun { display: none; }
+    [data-theme="light"] .icon-moon { display: none; }
+    [data-theme="light"] .icon-sun { display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative; overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(108,108,255,.18) 0%, transparent 70%);
+      top: -150px; left: -100px; pointer-events: none;
+    }
+    .hero-orb2 {
+      position: absolute; width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,229,176,.12) 0%, transparent 70%);
+      bottom: 0; right: -50px; pointer-events: none;
+    }
+
+    .tag {
+      font-family: var(--mono); font-size: .72rem; color: var(--accent2);
+      letter-spacing: .12em; text-transform: uppercase;
+      border: 1px solid rgba(0,229,176,.3); border-radius: 2rem;
+      padding: .35rem 1rem; margin-bottom: 2rem;
+      display: inline-block;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 800; line-height: 1.05;
+      letter-spacing: -.02em;
+      max-width: 900px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+
+    .hero-sub {
+      font-family: var(--mono); font-size: .95rem; color: var(--text-muted);
+      max-width: 620px; line-height: 1.8; margin-bottom: 2.5rem;
+    }
+
+    .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      font-family: var(--mono); font-size: .8rem; letter-spacing: .08em;
+      text-transform: uppercase; text-decoration: none;
+      padding: .75rem 1.8rem; border-radius: .4rem;
+      display: inline-flex; align-items: center; gap: .5rem;
+      transition: all .2s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #5555ee; transform: translateY(-1px); }
+    .btn-ghost { border: 1px solid var(--border); color: var(--text-muted); }
+    .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* ── STATS ── */
+    .stats-bar {
+      display: flex; justify-content: center; gap: 0;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .stat {
+      flex: 1; max-width: 200px;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1.8rem 1rem;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--accent2); }
+    .stat-label { font-family: var(--mono); font-size: .68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .1em; margin-top: .2rem; }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 6rem 3rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--mono); font-size: .72rem; color: var(--accent);
+      letter-spacing: .15em; text-transform: uppercase; margin-bottom: .8rem;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 700; letter-spacing: -.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      font-family: var(--mono); color: var(--text-muted);
+      font-size: .9rem; max-width: 620px; line-height: 1.8;
+      margin-bottom: 3rem;
+    }
+
+    .desc-block {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 1.8rem 2rem; border-radius: .5rem;
+      font-size: .95rem; line-height: 1.9; color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+    .desc-block strong { color: var(--text); }
+
+    /* ── COMPONENTS GRID ── */
+    .components-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-bottom: 4rem;
+    }
+    .comp-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: .8rem; padding: 2rem;
+      transition: border-color .2s, transform .2s;
+      position: relative; overflow: hidden;
+    }
+    .comp-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .3s;
+    }
+    .comp-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+    .comp-card:hover::before { transform: scaleX(1); }
+    .comp-num {
+      font-family: var(--mono); font-size: .72rem; color: var(--accent);
+      letter-spacing: .15em; margin-bottom: 1rem;
+    }
+    .comp-card h3 { font-size: 1.05rem; margin-bottom: .7rem; }
+    .comp-card p { font-family: var(--mono); font-size: .8rem; color: var(--text-muted); line-height: 1.8; }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: .6rem; padding: 1.5rem;
+      transition: border-color .2s;
+    }
+    .feature-card:hover { border-color: var(--accent2); }
+    .feature-icon { width: 28px; height: 28px; color: var(--accent2); margin-bottom: .8rem; }
+    .feature-card h3 { font-size: .95rem; margin-bottom: .5rem; }
+    .feature-card p { font-family: var(--mono); font-size: .78rem; color: var(--text-muted); line-height: 1.7; }
+
+    /* ── EXTENSIBILITY ── */
+    .ext-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      margin-top: 2rem;
+    }
+    @media (max-width: 700px) { .ext-grid { grid-template-columns: 1fr; } }
+    .ext-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: .5rem; padding: 1.2rem 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .ext-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent2); flex-shrink: 0; margin-top: .45rem;
+    }
+    .ext-item strong { display: block; font-size: .88rem; margin-bottom: .3rem; }
+    .ext-item span { font-family: var(--mono); font-size: .75rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── STACK ── */
+    .stack-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+    }
+    .stack-col {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: .6rem; padding: 1.5rem;
+    }
+    .stack-col h4 {
+      font-family: var(--mono); font-size: .72rem; color: var(--accent);
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-bottom: 1rem; padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .stack-col ul { list-style: none; }
+    .stack-col li {
+      font-family: var(--mono); font-size: .8rem; color: var(--text-muted);
+      padding: .3rem 0; border-bottom: 1px solid var(--border);
+    }
+    .stack-col li:last-child { border-bottom: none; }
+    .badge-future {
+      font-size: .6rem; background: rgba(108,108,255,.15); color: var(--accent);
+      border: 1px solid rgba(108,108,255,.3); border-radius: 2rem;
+      padding: .1rem .4rem; margin-left: .4rem; vertical-align: middle;
+    }
+
+    /* ── PUBLICATIONS ── */
+    .pub-list { display: flex; flex-direction: column; gap: .8rem; }
+    .pub-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: .5rem; padding: 1.2rem 1.5rem;
+      gap: 1rem; flex-wrap: wrap;
+      transition: border-color .2s;
+    }
+    .pub-item:hover { border-color: var(--accent); }
+    .pub-meta { display: flex; flex-direction: column; gap: .3rem; }
+    .pub-type { font-family: var(--mono); font-size: .68rem; color: var(--accent2); letter-spacing: .1em; text-transform: uppercase; }
+    .pub-title { font-size: .95rem; font-weight: 600; }
+    .pub-date { font-family: var(--mono); font-size: .72rem; color: var(--text-muted); }
+    .pub-link { font-family: var(--mono); font-size: .78rem; color: var(--accent); text-decoration: none; white-space: nowrap; }
+    .pub-link:hover { text-decoration: underline; }
+
+    /* ── MEDIA ── */
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .media-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: .6rem; overflow: hidden; cursor: pointer;
+      aspect-ratio: 16/9;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .2s, transform .2s;
+    }
+    .media-card:hover { border-color: var(--accent2); transform: scale(1.02); }
+    .media-card img, .media-card video { width: 100%; height: 100%; object-fit: cover; }
+    .media-placeholder { display: flex; flex-direction: column; align-items: center; gap: .5rem; color: var(--text-muted); font-family: var(--mono); font-size: .8rem; }
+
+    /* ── PROJECTS ── */
+    .projects-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+    .project-badge {
+      flex: 1; min-width: 200px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: .6rem; padding: 1.2rem 1.5rem;
+      text-decoration: none; display: flex; flex-direction: column; gap: .3rem;
+      transition: border-color .2s;
+    }
+    .project-badge:hover { border-color: var(--accent2); }
+    .project-badge-name { font-weight: 700; font-size: .95rem; color: var(--text); }
+    .project-badge-desc { font-family: var(--mono); font-size: .78rem; color: var(--text-muted); }
+    .project-badge-link { font-family: var(--mono); font-size: .72rem; color: var(--accent2); margin-top: .3rem; }
+
+    /* ── TEAM ── */
+    .team-section { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    @media (max-width: 800px) { .team-section { grid-template-columns: 1fr; } }
+    .team-group-label { font-family: var(--mono); font-size: .72rem; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 1rem; margin-top: 2rem; }
+    .team-grid { display: flex; flex-direction: column; gap: .8rem; }
+    .team-card { display: flex; align-items: center; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: .5rem; padding: .9rem 1.2rem; }
+    .team-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .team-info { display: flex; flex-direction: column; gap: .15rem; }
+    .team-name { font-weight: 600; font-size: .9rem; }
+    .team-role { font-family: var(--mono); font-size: .72rem; color: var(--text-muted); }
+    .team-email { font-family: var(--mono); font-size: .7rem; color: var(--accent); text-decoration: none; }
+    .team-email:hover { text-decoration: underline; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── MODAL ── */
+    .modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.9); align-items: center; justify-content: center; }
+    .modal-close { position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; color: #fff; cursor: pointer; font-family: var(--mono); }
+    .modal img { max-width: 90%; max-height: 90%; border-radius: .5rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+      font-family: var(--mono); font-size: .72rem; color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
   <nav>
-    <a class="logo" href="#"><span>//</span> PECI</a>
+    <a class="logo" href="#"><span>//</span> DataScope</a>
     <ul>
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#stack">Tecnologia</a></li>
-      <li><a href="#publicacoes">Publicações</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#stack">Stack</a></li>
+      <li><a href="#publications">Publications</a></li>
       <li><a href="#media">Media</a></li>
-      <li><a href="#equipa">Equipa</a></li>
+      <li><a href="#team">Team</a></li>
       <li>
-        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Alternar tema">
-          <!-- Moon icon (visible in dark mode) -->
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-          <!-- Sun icon (visible in light mode) -->
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-          </svg>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
       </li>
     </ul>
@@ -44,32 +355,32 @@
   <div class="hero">
     <div class="hero-orb"></div>
     <div class="hero-orb2"></div>
-    <div class="tag">Projeto de Engenharia de Computadores e Informática · Universidade de Aveiro</div>
-    <h1>Monitorização &<br><em>Controlo</em> de<br>Datacenters Dinâmicos</h1>
+    <div class="tag">Computer and Informatics Engineering Project · Universidade de Aveiro</div>
+    <h1>Modular Monitoring &<br><em>Performance Benchmarking</em><br>in Virtualised Infrastructures</h1>
     <p class="hero-sub">
-      Desenvolvimento de uma ferramenta de monitorização dinâmica capaz de se adaptar automaticamente às mudanças da infraestrutura — integrando observabilidade adaptativa, injeção de falhas e análise inteligente com recurso a Machine Learning.
+      A unified platform for adaptive metrics collection, controlled stress testing, hardware benchmarking, and intelligent analysis — designed for extensibility from the ground up.
     </p>
     <div class="btn-row">
-      <a href="#publicacoes" class="btn btn-primary">
+      <a href="#publications" class="btn btn-primary">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Publicações
+        Publications
       </a>
-      <a href="#sobre" class="btn btn-ghost">Saber Mais →</a>
+      <a href="#about" class="btn btn-ghost">Learn More →</a>
     </div>
   </div>
 
   <div class="stats-bar">
     <div class="stat">
-      <span class="stat-val">3</span>
-      <span class="stat-label">Componentes</span>
+      <span class="stat-val">4</span>
+      <span class="stat-label">Components</span>
     </div>
     <div class="stat">
       <span class="stat-val">3</span>
-      <span class="stat-label">Projetos EU</span>
+      <span class="stat-label">EU Projects</span>
     </div>
     <div class="stat">
       <span class="stat-val">5</span>
-      <span class="stat-label">Elementos</span>
+      <span class="stat-label">Members</span>
     </div>
     <div class="stat">
       <span class="stat-val">UA</span>
@@ -77,106 +388,143 @@
     </div>
   </div>
 
-  <!-- SOBRE -->
-  <section id="sobre">
+  <!-- ABOUT -->
+  <section id="about">
     <div class="reveal">
-      <p class="section-label">// Visão Geral</p>
-      <h2>O Que Estamos a Construir</h2>
+      <p class="section-label">// Overview</p>
+      <h2>What We Built</h2>
       <p class="section-desc">
-        A provisão moderna de serviços assenta em computação distribuída e redes complexas dentro de datacenters. Garantir que um serviço sobrevive a falhas de hardware, picos de tráfego e quedas de conectividade é um desafio central para o engenheiro de computadores de hoje.
+        Modern datacenter infrastructure spans heterogeneous hardware, virtualised workloads, and networked devices. Understanding how a VM behaves under real load — and testing its limits in a controlled way — requires tooling that brings collection, stress, benchmarking, and analysis into a single, extensible platform.
       </p>
     </div>
 
     <div class="desc-block reveal">
-      Este projeto propõe a elaboração de uma <strong>Ferramenta de Monitorização Dinâmica</strong> que se adapta automaticamente às condições em mudança da infraestrutura, sem necessidade de reescritas de código. A ferramenta recolhe informação de monitorização adequada a avaliar e melhorar as operações dos serviços em execução no datacenter. Executa simultaneamente <strong>testes de injeção de falhas e stress</strong>, e analisa automaticamente os dados obtidos. O sistema aborda três componentes distintas: <strong>observabilidade dinâmica</strong>, <strong>injeção de falhas</strong> e <strong>análise inteligente</strong>.
+      This project delivers a <strong>modular, extensible platform</strong> for infrastructure observability and performance testing. On one side, a <strong>Telegraf-based collector pipeline</strong> ingests metrics from multiple sources simultaneously — each new source requires only a container image and a configuration file, with no changes to the storage or orchestration layer. On the other side, a <strong>performance testing system</strong> built on Argo Workflows and k3s runs containerised stress and benchmark modules against target VMs, delivering structured results via HTTP callback. Both systems are integrated in a <strong>unified React dashboard</strong> and designed to produce labelled, timestamped datasets as the foundation for future ML-driven analysis.
     </div>
 
     <div class="components-grid reveal">
       <div class="comp-card">
         <div class="comp-num">01</div>
-        <h3>Observabilidade Dinâmica</h3>
-        <p>Recolha contínua e adaptativa de métricas de serviço, recursos e rede — sem reconfiguração manual quando a infraestrutura evolui. Suporta troca dinâmica de componentes, desacoplando a recolha de dados da visualização.</p>
+        <h3>Dynamic Observability</h3>
+        <p>Multi-source metrics collection via Telegraf pods orchestrated by Argo Workflows. Each source — Proxmox, Scaphandre, PDUs — runs as an independent pod. Adding a new source requires only a container image and a WorkflowTemplate. InfluxDB stores all metrics; Grafana correlates them with active test runs.</p>
       </div>
       <div class="comp-card">
         <div class="comp-num">02</div>
-        <h3>Injeção de Falhas & Stress</h3>
-        <p>Testes controlados de robustez e resiliência usando chaos engineering, perturbações de rede e geração de tráfego, para validar o comportamento dos serviços em condições adversas e identificar casos de uso críticos.</p>
+        <h3>Stress Testing</h3>
+        <p>Four containerised stress modules (CPU, Memory, IO, Network) scheduled on worker VMs via Argo. Resource validation runs before each test to prevent over-provisioning. Structured error callbacks report OOMKill, image pull failures, and bad parameters. k6 runs HTTP load against QuickPizza in parallel to measure application degradation.</p>
       </div>
       <div class="comp-card">
         <div class="comp-num">03</div>
-        <h3>Análise Inteligente</h3>
-        <p>Uso de técnicas de Machine Learning e LLMs (Llama, Mistral, Deepseek) para correlacionar dados, detetar anomalias, gerar relatórios automáticos e identificar a causa raiz de problemas de desempenho.</p>
+        <h3>Performance Benchmarking</h3>
+        <p>Five containerised benchmarks (STREAM, 7-zip, iperf3, fio, LMbench) characterise each worker VM before stress tests run. Results arrive via HTTP callback with raw scores, anomaly flags, and a diagnosis field. Baselines are stored per node and per benchmark type, enabling comparison across nodes and over time.</p>
       </div>
+      <div class="comp-card">
+        <div class="comp-num">04</div>
+        <h3>Intelligent Analysis</h3>
+        <p>The platform is designed for ML readiness from the start. Every run is labelled, timestamped, and stored. Stress run windows provide ground truth for supervised models. Future work includes saturation forecasting, anomaly detection, and bottleneck identification using the accumulated run history.</p>
+      </div>
+    </div>
+
+    <!-- MODULARITY -->
+    <div class="reveal" style="margin-top:4rem">
+      <p class="section-label">// Design Principles</p>
+      <h2>Modularity & Extensibility</h2>
+      <p class="section-desc">Both systems follow the same principle: adding a new source, module, or benchmark requires only a new container image and a definition file. The orchestration, storage, and UI layers remain unchanged.</p>
     </div>
 
     <div class="features-grid reveal">
       <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        <h3>Monitorização em Tempo Real</h3>
-        <p>Observação contínua de métricas de serviço, utilização de recursos e desempenho em nós distribuídos do datacenter via Prometheus e NetData.</p>
-      </div>
-      <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-        <h3>Controlo Adaptativo</h3>
-        <p>Ajuste dinâmico de alocação de recursos em resposta a variações de carga, com API de controlo exposta via FastAPI.</p>
-      </div>
-      <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        <h3>Eficiência Energética</h3>
-        <p>Minimização do consumo energético com gestão preditiva de recursos e métricas de energia através de Scaphandre e Kepler.</p>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <h3>Collector — Telegraf Plugin Model</h3>
+        <p>Each data source is a Telegraf pod with its own input plugin configuration. Proxmox, Scaphandre, and PDU pods run simultaneously and independently. A new source — GPU, containers, SNMP switch — requires a new container image and a WorkflowTemplate. No pipeline changes.</p>
       </div>
       <div class="feature-card">
         <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        <h3>Garantia de SLA</h3>
-        <p>Deteção proativa e mitigação de violações de SLA através de monitorização contínua de limiares e protocolos de resposta automatizados.</p>
+        <h3>Stress & Benchmark — WorkflowTemplate Pattern</h3>
+        <p>Every test and benchmark is a containerised WorkflowTemplate. Adding a new stress profile or benchmark requires only a Dockerfile and a YAML definition. The UI, backend, and Argo configuration require no changes. SPEC CPU 2017 will follow the same pattern when the license is acquired.</p>
       </div>
       <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <h3>Deteção de Anomalias</h3>
-        <p>Identificação assistida por ML de padrões anómalos usando TensorFlow/PyTorch antes de escalarem para disrupções de serviço.</p>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <h3>Node Scalability</h3>
+        <p>Adding a new worker node to the k3s cluster is three commands. Container images pull automatically from ghcr.io on first run. No pre-install, no host configuration, no NFS setup. Every benchmark and stress module is immediately available on the new node via the target-node parameter.</p>
       </div>
       <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-        <h3>Arquitetura Desacoplada</h3>
-        <p>Separação entre recolha de dados e visualização, permitindo a troca dinâmica de componentes de infraestrutura sem downtime.</p>
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+        <h3>Data-Driven by Design</h3>
+        <p>Every run is labelled with a workflow name, timestamp, node identifier, and test parameters. The Run Indexer attaches metadata to each execution. Stress windows provide ground truth labels for future ML models — the dataset forms automatically as the platform is used.</p>
       </div>
-      <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="4" y="4" width="16" height="16" rx="2"/>
-          <path d="M9 9h6v6H9z"/>
-          <path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/>
-        </svg>
-        <h3>Monitorização de Recursos (CPU & RAM)</h3>
-        <p>Recolha detalhada de métricas de CPU, memória, I/O e utilização por container/VM, permitindo identificar saturação, memory leaks e gargalos de desempenho em tempo real.</p>
-      </div>
-      <div class="feature-card">
-        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 8v4l3 3"/>
-        </svg>
-        <h3 onclick="openMedia('media/not_a_lebron_edit.mp4')">MVP – Prova de Conceito Inicial</h3>
-        <p>Sistema funcional capaz de monitorizar CPU, memória e rede em múltiplos nós, executar um teste de stress controlado e correlacionar automaticamente o impacto nos recursos.</p>
-      </div>  
     </div>
 
+    <!-- EXTENSIBILITY FUTURES -->
+    <div class="reveal" style="margin-top:3rem">
+      <p class="section-label">// Future Sources</p>
+      <h2>Extensibility Roadmap</h2>
+      <p class="section-desc">The Telegraf plugin model makes the following sources straightforward additions — each needing only a new pod configuration.</p>
+    </div>
+    <div class="ext-grid reveal">
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>Containers & Microservices</strong>
+          <span>Per-container CPU, memory, and network via Docker or containerd input plugins — workload-level observability independent of the VM.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>GPU</strong>
+          <span>Utilisation, memory, temperature, and power draw per card via the nvidia_smi plugin — relevant for ML inference workloads.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>Network-Attached Devices</strong>
+          <span>Interface counters, error rates, and queue statistics from switches and routers via SNMP. Wireless APs via vendor APIs.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>Latency</strong>
+          <span>Round-trip and DNS resolution latency via ping and dns_query plugins, complementing the bandwidth metrics already collected.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>Storage & NFS</strong>
+          <span>NFS mount statistics and distributed storage health for shared storage pools. Disk health via SMART plugin.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot"></div>
+        <div>
+          <strong>IoT & Edge</strong>
+          <span>Sensor data from IoT devices via MQTT plugin. Industrial sensors and PLCs via Modbus — common in datacenter power and cooling.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EU PROJECTS -->
     <div style="margin-top:4rem" class="reveal">
-      <p class="section-label" style="margin-bottom:1rem">// Contexto Internacional</p>
-      <h2 style="margin-bottom:.6rem">Projetos Europeus Associados</h2>
-      <p class="section-desc">Este projeto trabalha com infraestrutura de ponta atualmente utilizada em grandes projetos europeus de investigação.</p>
+      <p class="section-label" style="margin-bottom:1rem">// International Context</p>
+      <h2 style="margin-bottom:.6rem">Associated European Projects</h2>
+      <p class="section-desc">This project operates on infrastructure currently used in major European research initiatives.</p>
       <div class="projects-row">
         <a class="project-badge" href="https://imagineb5g.eu/" target="_blank">
           <span class="project-badge-name">IMAGINE-B5G</span>
-          <span class="project-badge-desc">Plataforma de experimentação para redes além do 5G</span>
+          <span class="project-badge-desc">Experimentation platform for beyond-5G networks</span>
           <span class="project-badge-link">imagineb5g.eu ↗</span>
         </a>
         <a class="project-badge" href="https://projectexigence.eu/" target="_blank">
           <span class="project-badge-name">EXIGENCE</span>
-          <span class="project-badge-desc">Infraestruturas de computação de ponta resilientes e eficientes</span>
+          <span class="project-badge-desc">Resilient and efficient edge computing infrastructures</span>
           <span class="project-badge-link">projectexigence.eu ↗</span>
         </a>
         <a class="project-badge" href="https://6g-versus.eu/" target="_blank">
           <span class="project-badge-name">6G-VERSUS</span>
-          <span class="project-badge-desc">Investigação e validação de redes 6G</span>
+          <span class="project-badge-desc">6G network research and validation</span>
           <span class="project-badge-link">6g-versus.eu ↗</span>
         </a>
       </div>
@@ -186,116 +534,154 @@
   <!-- STACK -->
   <section id="stack">
     <div class="reveal">
-      <p class="section-label">// Stack Tecnológico</p>
-      <h2>Ferramentas & Tecnologias</h2>
-      <p class="section-desc">Conjunto de tecnologias open-source recomendadas no enunciado do projeto e consideradas para a futura implementação da prova de conceito.</p>
+      <p class="section-label">// Technology Stack</p>
+      <h2>Tools & Technologies</h2>
+      <p class="section-desc">Implemented stack and planned future tooling. Items marked <span class="badge-future">future</span> are part of the planned ML and automation roadmap.</p>
     </div>
     <div class="stack-grid reveal">
       <div class="stack-col">
-        <h4>Automação</h4>
+        <h4>Collection</h4>
         <ul>
-          <li>Python / Bash</li>
-          <li>Ansible</li>
-          <li>FastAPI</li>
+          <li>Telegraf</li>
+          <li>InfluxDB</li>
+          <li>Grafana</li>
+          <li>Kafka</li>
+          <li>Scaphandre</li>
         </ul>
       </div>
       <div class="stack-col">
-        <h4>IA & Análise</h4>
+        <h4>Orchestration</h4>
         <ul>
-          <li>TensorFlow / PyTorch</li>
-          <li>Llama / Mistral</li>
-          <li>Deepseek</li>
+          <li>Argo Workflows</li>
+          <li>k3s</li>
+          <li>Docker</li>
+          <li>Kubernetes</li>
+          <li>Ansible <span class="badge-future">future</span></li>
         </ul>
       </div>
       <div class="stack-col">
-        <h4>Observabilidade</h4>
+        <h4>Stress & Benchmark</h4>
         <ul>
-          <li>Prometheus</li>
-          <li>Node Exporter</li>
-          <li>Grafana / Loki / Tempo</li>
-          <li>NetData</li>
-          <li>Scaphandre / Kepler</li>
-        </ul>
-      </div>
-      <div class="stack-col">
-        <h4>Rede</h4>
-        <ul>
-          <li>IPFIX / NETFLOW</li>
-          <li>Zeek</li>
+          <li>stress-ng</li>
+          <li>fio</li>
+          <li>iperf3</li>
+          <li>STREAM</li>
+          <li>7-zip / LMbench</li>
         </ul>
       </div>
       <div class="stack-col">
         <h4>Chaos Engineering</h4>
         <ul>
           <li>ChaosMesh</li>
+          <li>k6</li>
           <li>Linux tc / netem</li>
-          <li>Iperf3 / Locust</li>
-          <li>DeathStarBench</li>
+          <li>QuickPizza</li>
         </ul>
       </div>
       <div class="stack-col">
-        <h4>Infraestrutura</h4>
+        <h4>UI & Backend</h4>
         <ul>
-          <li>Docker</li>
-          <li>Kubernetes</li>
+          <li>React</li>
+          <li>Express.js</li>
+          <li>FastAPI</li>
+          <li>Python</li>
+        </ul>
+      </div>
+      <div class="stack-col">
+        <h4>AI & Analysis</h4>
+        <ul>
+          <li>TensorFlow <span class="badge-future">future</span></li>
+          <li>PyTorch <span class="badge-future">future</span></li>
+          <li>Llama / Mistral <span class="badge-future">future</span></li>
+          <li>Deepseek <span class="badge-future">future</span></li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- PUBLICAÇÕES -->
-  <section id="publicacoes">
+  <!-- PUBLICATIONS -->
+  <section id="publications">
     <div class="reveal">
-      <p class="section-label">// Publicações & Documentos</p>
-      <h2>Resultados de Investigação</h2>
-      <p class="section-desc">
-        Apresentações, relatórios técnicos e documentação produzidos ao longo do projeto.
-      </p>
+      <p class="section-label">// Publications & Documents</p>
+      <h2>Research Output</h2>
+      <p class="section-desc">Presentations, technical reports, and documentation produced throughout the project.</p>
     </div>
     <div class="pub-list reveal">
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Descrição do Projeto</span>
-          <span class="pub-title">Monitorização e Controlo de Desempenho em Datacenters Dinâmicos</span>
+          <span class="pub-type">Project Description</span>
+          <span class="pub-title">Monitoring and Performance Control in Dynamic Datacenters</span>
           <span class="pub-date">2026</span>
         </div>
         <a href="docs/01 _ Better Monitoring in datacenters.pdf" class="pub-link" download>Download →</a>
       </div>
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Apresentação</span>
+          <span class="pub-type">Presentation</span>
           <span class="pub-title">Inception</span>
           <span class="pub-date">2026</span>
         </div>
-        <a href="docs/M1 - Inception (1).pdf" class="pub-link">Ver →</a>
+        <a href="docs/M1 - Inception (1).pdf" class="pub-link">View →</a>
       </div>
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Resumo</span>
-          <span class="pub-title">Inception Phase</span>
+          <span class="pub-type">Report</span>
+          <span class="pub-title">Inception</span>
           <span class="pub-date">2026</span>
         </div>
         <a href="docs/Inception_PECI_V2.pdf" class="pub-link" download>Download →</a>
       </div>
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Apresentação</span>
+          <span class="pub-type">Presentation</span>
           <span class="pub-title">Elaboration</span>
           <span class="pub-date">2026</span>
         </div>
-        <a href="docs/M2 - Elaboration.pdf" class="pub-link">Ver →</a>
+        <a href="docs/M2 - Elaboration.pdf" class="pub-link">View →</a>
       </div>
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Resumo</span>
-          <span class="pub-title">Elaboration Phase</span>
+          <span class="pub-type">Report</span>
+          <span class="pub-title">Elaboration</span>
           <span class="pub-date">2026</span>
         </div>
         <a href="docs/Elaboration_PECI.pdf" class="pub-link" download>Download →</a>
       </div>
       <div class="pub-item">
         <div class="pub-meta">
-          <span class="pub-type">Relatório</span>
+          <span class="pub-type">Presentation</span>
+          <span class="pub-title">Construction</span>
+          <span class="pub-date">2026</span>
+        </div>
+        <a href="docs/M3 - Construction.pdf" class="pub-link">View →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Report</span>
+          <span class="pub-title">Construction</span>
+          <span class="pub-date">2026</span>
+        </div>
+        <a href="docs/Construction_PECI.pdf" class="pub-link" download>Download →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Presentation</span>
+          <span class="pub-title">Transition</span>
+          <span class="pub-date">2026</span>
+        </div>
+        <a href="docs/M4 - Transition.pdf" class="pub-link">View →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Report</span>
+          <span class="pub-title">Transition</span>
+          <span class="pub-date">2026</span>
+        </div>
+        <a href="docs/Transition_PECI.pdf" class="pub-link" download>Download →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">Report</span>
           <span class="pub-title">Final Report</span>
           <span class="pub-date">2026</span>
         </div>
@@ -308,17 +694,15 @@
   <section id="media">
     <div class="reveal">
       <p class="section-label">// Media</p>
-      <h2>Imagens & Vídeos</h2>
-      <p class="section-desc">
-        Documentação visual do projeto, incluindo capturas de ecrã e apresentações gravadas.
-      </p>
+      <h2>Screenshots & Videos</h2>
+      <p class="section-desc">Visual documentation of the project including dashboard screenshots and recorded demos.</p>
     </div>
     <div class="media-grid reveal">
       <div class="media-card" onclick="openModal(this)">
-        <img src="media/img1.png">
+        <img src="media/img1.png" alt="Dashboard screenshot">
       </div>
       <div class="media-card" onclick="openModal(this)">
-        <img src="media/img2.png">
+        <img src="media/img2.png" alt="Dashboard screenshot">
       </div>
       <div class="media-card" onclick="openModal(this)">
         <video src="media/video.mp4"></video>
@@ -326,62 +710,62 @@
       <div class="media-card" onclick="openModal(this)">
         <div class="media-placeholder">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          <span>Vídeo</span>
+          <span>Video</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- EQUIPA -->
-  <section id="equipa">
+  <!-- TEAM -->
+  <section id="team">
     <div class="reveal">
-      <p class="section-label">// Equipa</p>
-      <h2>Equipa do Projeto</h2>
+      <p class="section-label">// Team</p>
+      <h2>Project Team</h2>
     </div>
     <div class="team-section reveal">
       <div>
-        <p class="team-group-label">Orientadores</p>
+        <p class="team-group-label">Supervisors</p>
         <div class="team-grid">
           <div class="team-card">
             <div class="team-avatar">DC</div>
             <div class="team-info">
               <span class="team-name">Daniel Corujo</span>
-              <span class="team-role">Professor · Orientador</span>
+              <span class="team-role">Professor · Supervisor</span>
               <a class="team-email" href="mailto:dcorujo@ua.pt">dcorujo@ua.pt</a>
             </div>
           </div>
-          <div class="team-card">
+          <div class="team-card" onclick="openVideo()" style="cursor: pointer;">
             <div class="team-avatar">RA</div>
             <div class="team-info">
               <span class="team-name">Rui Luís Aguiar</span>
-              <span class="team-role">Professor · Orientador</span>
+              <span class="team-role">Professor · Supervisor</span>
               <a class="team-email" href="mailto:ruilaa@ua.pt">ruilaa@ua.pt</a>
             </div>
           </div>
         </div>
-        <p class="team-group-label">Contribuidores</p>
+        <p class="team-group-label">Contributors — Instituto de Telecomunicações</p>
         <div class="team-grid">
           <div class="team-card">
             <div class="team-avatar">AC</div>
             <div class="team-info">
               <span class="team-name">Alisson Chaves</span>
-              <span class="team-role">Contribuidor</span>
-               <a class="team-email" href="mailto:aoc.alisson@av.it.pt">aoc.alisson@av.it.pt</a>
+              <span class="team-role">Researcher · IT Aveiro</span>
+              <a class="team-email" href="mailto:aoc.alisson@av.it.pt">aoc.alisson@av.it.pt</a>
             </div>
           </div>
           <div class="team-card">
             <div class="team-avatar">DS</div>
             <div class="team-info">
               <span class="team-name">David Santos</span>
-              <span class="team-role">Contribuidor</span>
-                <a class="team-email" href="mailto:davidsantos@av.it.pt">davidsantos@av.it.pt</a>
+              <span class="team-role">Researcher · IT Aveiro</span>
+              <a class="team-email" href="mailto:davidsantos@av.it.pt">davidsantos@av.it.pt</a>
             </div>
           </div>
           <div class="team-card">
             <div class="team-avatar">TB</div>
             <div class="team-info">
               <span class="team-name">Tiago Barros</span>
-              <span class="team-role">Contribuidor</span>
+              <span class="team-role">Researcher · IT Aveiro</span>
               <a class="team-email" href="mailto:tiagobarros@av.it.pt">tiagobarros@av.it.pt</a>
             </div>
           </div>
@@ -389,20 +773,20 @@
             <div class="team-avatar">RS</div>
             <div class="team-info">
               <span class="team-name">Rui Silva</span>
-              <span class="team-role">Contribuidor</span>
+              <span class="team-role">Researcher · IT Aveiro</span>
               <a class="team-email" href="mailto:ruimiguelsilva@av.it.pt">ruimiguelsilva@av.it.pt</a>
             </div>
           </div>
         </div>
       </div>
       <div>
-        <p class="team-group-label">Grupo de Estudantes</p>
+        <p class="team-group-label">Student Group</p>
         <div class="team-grid">
           <div class="team-card">
             <div class="team-avatar">RF</div>
             <div class="team-info">
               <span class="team-name">Rafael Ferreira</span>
-              <span class="team-role">Aluno de LECI</span>
+              <span class="team-role">LECI Student</span>
               <a class="team-email" href="mailto:rafaelmferreira0@ua.pt">rafaelmferreira0@ua.pt</a>
             </div>
           </div>
@@ -410,7 +794,7 @@
             <div class="team-avatar">AR</div>
             <div class="team-info">
               <span class="team-name">Adriana Rocha</span>
-              <span class="team-role">Aluna de LECI</span>
+              <span class="team-role">LECI Student</span>
               <a class="team-email" href="mailto:adrianarocha@ua.pt">adrianarocha@ua.pt</a>
             </div>
           </div>
@@ -418,7 +802,7 @@
             <div class="team-avatar">AS</div>
             <div class="team-info">
               <span class="team-name">André Silva</span>
-              <span class="team-role">Aluno de LECI</span>
+              <span class="team-role">LECI Student</span>
               <a class="team-email" href="mailto:andre.castelhanos@ua.pt">andre.castelhanos@ua.pt</a>
             </div>
           </div>
@@ -426,7 +810,7 @@
             <div class="team-avatar">DO</div>
             <div class="team-info">
               <span class="team-name">Dinis Oliveira</span>
-              <span class="team-role">Aluno de LECI</span>
+              <span class="team-role">LECI Student</span>
               <a class="team-email" href="mailto:dinis.oliveira@ua.pt">dinis.oliveira@ua.pt</a>
             </div>
           </div>
@@ -434,7 +818,7 @@
             <div class="team-avatar">GG</div>
             <div class="team-info">
               <span class="team-name">Guilherme Goulart</span>
-              <span class="team-role">Aluno de LECI</span>
+              <span class="team-role">LECI Student</span>
               <a class="team-email" href="mailto:guilhermegoulart@ua.pt">guilhermegoulart@ua.pt</a>
             </div>
           </div>
@@ -444,8 +828,8 @@
   </section>
 
   <footer>
-    <p>© 2026 PECI · Universidade de Aveiro. Todos os direitos reservados.</p>
-    <p>Monitorização e Controlo de Desempenho em Datacenters Dinâmicos</p>
+    <p>© 2026 PECI · Universidade de Aveiro. All rights reserved.</p>
+    <p>Modular Monitoring and Performance Benchmarking in Virtualised Infrastructures</p>
   </footer>
 
   <div id="imageModal" class="modal">
@@ -454,94 +838,84 @@
     <video id="modalVideo" controls style="display:none; max-width:90%; max-height:90%;"></video>
   </div>
 
+    <!-- Modal overlay -->
+    <div id="video-modal" style="display:none; position:fixed; inset:0;
+         background:rgba(0,0,0,0.75); z-index:1000;
+         align-items:center; justify-content:center;">
+      <div style="position:relative; max-width:800px; width:90%;">
+        <button onclick="closeVideo()"
+                style="position:absolute; top:-36px; right:0;
+                       color:#fff; background:none; border:none;
+                       font-size:24px; cursor:pointer;">✕</button>
+        <video id="team-video" controls style="width:100%; border-radius:8px;">
+          <source src="media/not_a_lebron_edit.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+
   <script>
-    /* ─── THEME TOGGLE ─── */
     function toggleTheme() {
       const html = document.documentElement;
       const isLight = html.getAttribute('data-theme') === 'light';
       html.setAttribute('data-theme', isLight ? 'dark' : 'light');
       localStorage.setItem('theme', isLight ? 'dark' : 'light');
     }
-
-    /* Restore saved preference on load */
     (function () {
       const saved = localStorage.getItem('theme');
       if (saved) document.documentElement.setAttribute('data-theme', saved);
     })();
 
-    /* ─── SCROLL REVEAL ─── */
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('visible');
-      });
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.08 });
-
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    document.querySelectorAll('.features-grid, .pub-list, .media-grid, .stack-grid, .components-grid, .projects-row, .team-grid').forEach(parent => {
-      [...parent.children].forEach((child, i) => {
-        child.style.transitionDelay = `${i * 60}ms`;
-      });
+    document.querySelectorAll('.features-grid, .pub-list, .media-grid, .stack-grid, .components-grid, .projects-row, .team-grid, .ext-grid').forEach(parent => {
+      [...parent.children].forEach((child, i) => { child.style.transitionDelay = `${i * 60}ms`; });
     });
 
-    /* ─── MODAL ─── */
     function openModal(card) {
       const modal = document.getElementById('imageModal');
       const modalImg = document.getElementById('modalImg');
       const modalVideo = document.getElementById('modalVideo');
-
       const img = card.querySelector('img');
       const video = card.querySelector('video');
-
       modalImg.style.display = 'none';
       modalVideo.style.display = 'none';
-      modalVideo.pause();
-      modalVideo.src = '';
-
-      if (img) {
-        modalImg.src = img.src;
-        modalImg.style.display = 'block';
-      }
-      if (video) {
-        modalVideo.src = video.src;
-        modalVideo.style.display = 'block';
-        modalVideo.play();
-      }
-
+      modalVideo.pause(); modalVideo.src = '';
+      if (img) { modalImg.src = img.src; modalImg.style.display = 'block'; }
+      if (video) { modalVideo.src = video.src; modalVideo.style.display = 'block'; modalVideo.play(); }
       modal.style.display = 'flex';
     }
-
     function closeModal() {
-      const modal = document.getElementById('imageModal');
-      const modalVideo = document.getElementById('modalVideo');
-      modal.style.display = 'none';
-      modalVideo.pause();
+      document.getElementById('imageModal').style.display = 'none';
+      const v = document.getElementById('modalVideo');
+      v.pause(); v.src = '';
     }
 
-    function openMedia(src) {
-      const modal = document.getElementById('imageModal');
-      const modalImg = document.getElementById('modalImg');
-      const modalVideo = document.getElementById('modalVideo');
-
-      // Reset
-      modalImg.style.display = 'none';
-      modalVideo.style.display = 'none';
-      modalVideo.pause();
-      modalVideo.src = '';
-
-      // Detect type by extension
-      if (src.match(/\.(mp4|webm|ogg)$/i)) {
-        modalVideo.src = src;
-        modalVideo.style.display = 'block';
-        modalVideo.play();
-      } else {
-        modalImg.src = src;
-        modalImg.style.display = 'block';
-      }
-
+    function openVideo() {
+      const modal = document.getElementById('video-modal');
       modal.style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('team-video').play();
+      }, 50);
     }
+
+  function closeVideo() {
+    const modal = document.getElementById('video-modal');
+    modal.style.display = 'none';
+    document.getElementById('team-video').pause();
+  }
+
+  // Close on backdrop click
+  document.getElementById('video-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeVideo();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeVideo();
+  });
   </script>
-   <script src="Particles.js"></script>
 </body>
 </html>
