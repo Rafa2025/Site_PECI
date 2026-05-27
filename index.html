@@ -323,7 +323,7 @@
     /* ── MODAL ── */
     .modal { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.9); align-items: center; justify-content: center; }
     .modal-close { position: absolute; top: 1.5rem; right: 2rem; font-size: 2rem; color: #fff; cursor: pointer; font-family: var(--mono); }
-    .modal img { max-width: 90%; max-height: 90%; border-radius: .5rem; }
+    .modal img { max-width: 85vw; max-height: 85vh; width: auto; height: auto; object-fit: contain; border-radius: .5rem; }
 
     /* ── FOOTER ── */
     footer {
@@ -703,6 +703,18 @@
       </div>
       <div class="media-card" onclick="openModal(this)">
         <img src="media/Stress_Architecture.png" alt="Stress Architecture">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/Overall_Architecture.jpeg" alt="Overall Architecture">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/Poster_Students@DETI.png" alt="Final Poster">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/ml_pipeline_overview.png" alt="ML Pipeline Overview">
+      </div>
+      <div class="media-card" onclick="openModal(this)">
+        <img src="media/ml_inference_paths.png" alt="ML Inference Paths">
       </div>
       <div class="media-card" onclick="openModal(this)">
         <video src="media/video.mp4"></video>
