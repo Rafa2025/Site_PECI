@@ -342,6 +342,7 @@
       <li><a href="#stack">Stack</a></li>
       <li><a href="#publications">Publications</a></li>
       <li><a href="#media">Media</a></li>
+      <li><a href="#docs">Docs</a></li>
       <li><a href="#team">Team</a></li>
       <li>
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
@@ -724,6 +725,287 @@
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
           <span>Video</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOCUMENTATION & API REFERENCE -->
+  <section id="docs">
+    <div class="reveal">
+      <p class="section-label">// Modules & APIs</p>
+      <h2>Documentation & API Reference</h2>
+      <p class="section-desc">
+        Real API reference for all three platform components — collector, stress modules,
+        and benchmark modules. Full documentation available in the linked reference files.
+      </p>
+    </div>
+
+    <!-- AUTH -->
+    <div class="reveal" style="margin-top:2rem">
+      <p class="section-label" style="margin-bottom:1rem">// Authentication</p>
+    </div>
+    <div class="desc-block reveal" style="background:var(--surface2); border-left-color:var(--accent2);">
+      <strong style="color:var(--accent2); display:block; margin-bottom:.8rem;">
+        Bearer token — retrieve at any time from stressmaster
+      </strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.8; white-space:pre-wrap;">kubectl get secret stress-ui-sa-token -n stress \
+    -o jsonpath='{.data.token}' | base64 -d
+
+  export ARGO="https://10.255.32.82:32746"
+  export ARGO_TOKEN=$(kubectl get secret stress-ui-sa-token -n stress \
+    -o jsonpath='{.data.token}' | base64 -d)
+  export CALLBACK="http://&lt;ui-vm-ip&gt;:3001/api/callback"</code>
+      <strong style="color:var(--accent3); display:block; margin-top:.8rem; font-size:.8rem;">
+        Unauthorized → {"code": 16, "message": "token not found"}
+      </strong>
+    </div>
+
+    <!-- MODULE OVERVIEW -->
+    <div class="reveal" style="margin-top:3rem">
+      <p class="section-label" style="margin-bottom:1rem">// Core APIs</p>
+    </div>
+    <div class="components-grid reveal">
+      <div class="comp-card">
+        <div class="comp-num">COLLECTOR</div>
+        <h3>Collector API</h3>
+        <p style="margin-bottom:.8rem">Single endpoint — POST /submit. Triggers fan-out of ephemeral Telegraf Jobs via Argo. 3 sources: Proxmox, Scaphandre, PDU. 28 KPIs total.</p>
+        <p><code style="font-family:var(--mono); font-size:.75rem; color:var(--accent2);">telegraf-proxmox-jobs · telegraf-scaphandre-jobs · telegraf-pdu-jobs</code></p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-num">STRESS</div>
+        <h3>Stress Modules</h3>
+        <p style="margin-bottom:.8rem">4 modules — CPU, Memory, IO, Network. CPU and Memory include pre-flight resource validation.</p>
+        <p><code style="font-family:var(--mono); font-size:.75rem; color:var(--accent2);">cpu-stress-api · memory-stress-api · io-stress-api · network-stress-api</code></p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-num">BENCH</div>
+        <h3>Benchmark Modules</h3>
+        <p style="margin-bottom:.8rem">5 modules — STREAM, 7-zip, iperf3, fio, LMbench. Results include raw scores, anomaly flags, and diagnosis.</p>
+        <p><code style="font-family:var(--mono); font-size:.75rem; color:var(--accent2);">stream-bench · 7zip-bench · iperf3-bench · fio-bench · lmbench-bench</code></p>
+      </div>
+      <div class="comp-card">
+        <div class="comp-num">CB</div>
+        <h3>Callbacks</h3>
+        <p>Stress and benchmark modules POST results to <code style="font-family:var(--mono); font-size:.78rem;">callback-url</code> on completion or failure. Fires via <code style="font-family:var(--mono); font-size:.78rem;">onExit</code> — always runs even if the test crashes.</p>
+      </div>
+    </div>
+
+    <!-- COLLECTOR CURL EXAMPLE -->
+    <div class="reveal" style="margin-top:4rem">
+      <p class="section-label" style="margin-bottom:1rem">// Quick Start — Collector</p>
+      <h2 style="margin-bottom:1.5rem">Trigger a Collection Run</h2>
+    </div>
+
+    <div class="desc-block reveal" style="background:var(--surface2); border-left-color:var(--accent2);">
+      <strong style="color:var(--accent2); display:block; margin-bottom:.8rem;">POST /submit — collect from all sources</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.8; white-space:pre-wrap;">curl -X POST http://&lt;api-host&gt;:8000/submit \
+    -H "Content-Type: application/json" \
+    -d '{
+      "targets": [
+        {
+          "source": "proxmox",
+          "host": "&lt;proxmox-ip&gt;",
+          "node": "&lt;proxmox-node&gt;",
+          "target": "&lt;vm-id&gt;",
+          "duration": 30
+        },
+        {
+          "source": "scaphandre",
+          "host": "&lt;scaphandre-ip&gt;",
+          "target": "&lt;machine-name&gt;",
+          "duration": 30
+        },
+        {
+          "source": "pdu",
+          "host": "&lt;pdu-ip&gt;",
+          "duration": 30
+        }
+      ]
+    }'</code>
+      <strong style="color:var(--accent); display:block; margin-top:.8rem; margin-bottom:.4rem; font-size:.8rem;">Response</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.6; white-space:pre-wrap;">{
+    "status": "success",
+    "submitted": 2,
+    "results": [
+      { "source": "proxmox",     "status": "success", "targets_count": 12 },
+      { "source": "scaphandre",  "status": "success", "targets_count": 14 }
+    ]
+  }</code>
+      <strong style="color:var(--text-muted); display:block; margin-top:.8rem; font-size:.75rem;">
+        Note: the <code style="font-family:var(--mono);">kpi</code> field is accepted but ignored — all KPIs for the source are always collected.
+      </strong>
+    </div>
+
+    <!-- COLLECTOR CAPABILITIES -->
+    <div class="reveal" style="margin-top:2rem">
+      <p class="section-label" style="margin-bottom:1rem">// Collector Sources & KPIs</p>
+    </div>
+    <div class="ext-grid reveal">
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Proxmox — 12 KPIs</strong>
+          <span>Via Proxmox VE REST API (inputs.http). Collects per-VM: cpu, cpus, mem, maxmem, disk, maxdisk, netin, netout, diskread, diskwrite, uptime, status. No agent on the VM.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Scaphandre — 14 KPIs</strong>
+          <span>Via Prometheus scrape (inputs.prometheus). Host, socket, domain, and per-process power/energy in µW and µJ. Also per-process CPU, memory, and disk read/write rates.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>PDU — 2 KPIs</strong>
+          <span>Via SNMP v1 (inputs.snmp). Per-outlet active power (W) and total PDU power draw (W). Outlet name and index captured as tags.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Output — InfluxDB + Kafka</strong>
+          <span>All metrics tagged with host, target, and collection timestamp. Written to InfluxDB (org: UA, bucket: monitoring) and optionally to Kafka (one topic per source/target/KPI).</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRESS CURL EXAMPLES -->
+    <div class="reveal" style="margin-top:4rem">
+      <p class="section-label" style="margin-bottom:1rem">// Quick Start — Stress & Benchmarks</p>
+      <h2 style="margin-bottom:.5rem">Authentication — Test Stress Manager</h2>
+    </div>
+
+    <div class="desc-block reveal" style="background:var(--surface2); border-left-color:var(--accent2);">
+      <strong style="color:var(--accent2); display:block; margin-bottom:.8rem;">CPU Stress</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.8; white-space:pre-wrap;">curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
+    -H "Authorization: Bearer ${ARGO_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "workflow": {
+        "metadata": { "generateName": "cpu-ui-" },
+        "spec": {
+          "workflowTemplateRef": { "name": "cpu-stress-api" },
+          "arguments": { "parameters": [
+            { "name": "target-node", "value": "demo" },
+            { "name": "workers",     "value": "2" },
+            { "name": "load",        "value": "50" },
+            { "name": "timeout",     "value": "1m" },
+            { "name": "callback-url","value": "'${CALLBACK}'" }
+          ]}
+        }
+      }
+    }'</code>
+      <strong style="color:var(--accent); display:block; margin-top:.8rem; margin-bottom:.4rem; font-size:.8rem;">Response</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.6;">{"metadata": {"name": "cpu-ui-abc12"}, "status": {"phase": "Pending"}}</code>
+    </div>
+
+    <div class="desc-block reveal" style="background:var(--surface2); border-left-color:var(--accent2);">
+      <strong style="color:var(--accent2); display:block; margin-bottom:.8rem;">STREAM Benchmark</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.8; white-space:pre-wrap;">curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
+    -H "Authorization: Bearer ${ARGO_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "workflow": {
+        "metadata": { "generateName": "stream-" },
+        "spec": {
+          "workflowTemplateRef": { "name": "stream-bench" },
+          "arguments": { "parameters": [
+            { "name": "target-node",  "value": "demo" },
+            { "name": "threads",      "value": "4" },
+            { "name": "callback-url", "value": "'${CALLBACK}'" }
+          ]}
+        }
+      }
+    }'</code>
+      <strong style="color:var(--accent); display:block; margin-top:.8rem; margin-bottom:.4rem; font-size:.8rem;">Callback result</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.6; white-space:pre-wrap;">{
+    "status": "Succeeded",
+    "test_type": "stream-bench",
+    "result": {
+      "raw": { "copy_mbps": 91815, "triad_mbps": 93581 },
+      "efficiency_pct": null,
+      "anomalies": [],
+      "diagnosis": "healthy"
+    }
+  }</code>
+    </div>
+
+    <div class="desc-block reveal" style="background:var(--surface2); border-left-color:var(--accent3);">
+      <strong style="color:var(--accent3); display:block; margin-bottom:.8rem;">Failure Callback — OOMKill example</strong>
+      <code style="font-family:var(--mono); font-size:.75rem; color:var(--text-muted); display:block; line-height:1.8; white-space:pre-wrap;">{
+    "workflow": "mem-ui-xyz99",
+    "status": "Failed",
+    "test_type": "memory",
+    "error": {
+      "type": "resource_exhaustion",
+      "reason": "OOMKilled",
+      "message": "Container killed — memory limit exceeded. Lower size or mem_lim."
+    }
+  }</code>
+    </div>
+
+    <!-- CAPABILITIES -->
+    <div class="reveal" style="margin-top:4rem">
+      <p class="section-label" style="margin-bottom:1rem">// Stress & Benchmark Capabilities</p>
+    </div>
+    <div class="ext-grid reveal">
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Stress Modules</strong>
+          <span>CPU (stress-ng), Memory (stress-ng --memrate, built from source), IO (fio), Network (iperf3). CPU and Memory include pre-flight node capacity validation.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Benchmark Modules</strong>
+          <span>STREAM (memory bandwidth), 7-zip (CPU integer MIPS + scaling efficiency), iperf3 (TCP/UDP throughput + jitter + loss), fio (IOPS + latency percentiles), LMbench (cache hierarchy latency curve).</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Enriched Error Callbacks</strong>
+          <span>Every failure returns a structured error with type, reason, and actionable message. Types: resource_exhaustion, config_error, bad_params, stress_error, workflow_error.</span>
+        </div>
+      </div>
+      <div class="ext-item">
+        <div class="ext-dot" style="background:var(--accent2);"></div>
+        <div>
+          <strong>Workflow Operations</strong>
+          <span>List all workflows, poll status by name, terminate running workflows. Phases: Pending → Running → Succeeded / Failed / Error.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS LINKS -->
+    <div class="reveal" style="margin-top:3rem">
+      <p class="section-label" style="margin-bottom:1rem">// Full Reference</p>
+    </div>
+    <div class="pub-list reveal">
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">API Reference</span>
+          <span class="pub-title">Collector — architecture, sources, KPI tables, trigger API, output format</span>
+        </div>
+        <a href="docs/collector-api-reference.md" class="pub-link" download>Download →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">API Reference</span>
+          <span class="pub-title">Stress Modules — full parameter tables, callback payloads, error reference</span>
+        </div>
+        <a href="docs/stressmaster-api-reference.md" class="pub-link" download>Download →</a>
+      </div>
+      <div class="pub-item">
+        <div class="pub-meta">
+          <span class="pub-type">API Reference</span>
+          <span class="pub-title">Benchmark Modules — full parameter tables, callback payloads, sequence diagram</span>
+        </div>
+        <a href="docs/benchmark-api-reference.md" class="pub-link" download>Download →</a>
       </div>
     </div>
   </section>
