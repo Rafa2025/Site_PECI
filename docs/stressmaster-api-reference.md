@@ -10,139 +10,74 @@
 
 ## Authentication
 
-All requests require a Bearer token. The token is stored as a Kubernetes Secret and can be retrieved at any time from stressmaster:
+Retrieve token at any time from stressmaster:
 
 ```bash
 kubectl get secret stress-ui-sa-token -n stress \
   -o jsonpath='{.data.token}' | base64 -d
 ```
 
-Set it as an environment variable for convenience:
+Set environment variables:
 
 ```bash
 export ARGO="https://10.255.32.82:32746"
 export ARGO_TOKEN=$(kubectl get secret stress-ui-sa-token -n stress \
   -o jsonpath='{.data.token}' | base64 -d)
-export CALLBACK="http://<ui-vm-ip>:3000/api/callback"
+export CALLBACK="http://<ui-vm-ip>:3001/api/callback"
 ```
 
-Unauthorized request response:
-```json
-{"code": 16, "message": "token not found"}
-```
+Unauthorized response: `{"code": 16, "message": "token not found"}`
 
 ---
 
 ## Module Overview
 
-| Module | WorkflowTemplate | What it does |
-|--------|-----------------|--------------|
-| **CPU** | `cpu-stress-api` | Saturates CPU cores using stress-ng with configurable load %, worker count, duration, and CPU pinning via cpuset |
-| **Memory** | `memory-stress-api` | Allocates and accesses memory at configurable size and rate using a custom memory stressor, with read/write MB/s throttling |
-| **IO** | `io-stress-api` | Runs fio-based disk stress with configurable mode (sequential/random read/write), block size, IO depth, and throughput targets |
-| **Network** | `network-stress-api` | Runs iperf3 against a target server with configurable bandwidth, protocol (TCP/UDP), and direction (upload/download) |
+| Module | WorkflowTemplate | Primary resource stressed |
+|--------|-----------------|--------------------------|
+| **CPU** | `cpu-stress-api` | Processor cores and instruction throughput |
+| **Memory** | `memory-stress-api` | DRAM read/write bandwidth at configurable rate caps |
+| **IO** | `io-stress-api` | Disk read/write throughput and I/O depth |
+| **Network** | `network-stress-api` | Network bandwidth and packet throughput |
+| **QuickPizza K6** | `quickpizza-full-k6` | HTTP application load via distributed k6 runners |
 
 All modules:
 - Run on a specific worker node via `target-node`
-- Validate CPU/memory resources before spawning (CPU and memory modules only)
-- Send an enriched callback on completion or failure
-- Support `onExit` notify — callback fires regardless of outcome
+- Send an enriched callback on completion or failure via `onExit` — fires regardless of outcome
+- CPU and Memory modules validate node resources before spawning
 
 ---
 
 ## Operations
 
-### 1. List workflows
-
-Returns all workflows in the stress namespace, most recent first.
+### List workflows
 
 ```bash
 curl -sk "${ARGO}/api/v1/workflows/stress" \
   -H "Authorization: Bearer ${ARGO_TOKEN}"
 ```
 
-**Response:**
-```json
-{
-  "items": [
-    {
-      "metadata": {
-        "name": "cpu-ui-abc12",
-        "namespace": "stress"
-      },
-      "status": {
-        "phase": "Succeeded",
-        "startedAt": "2026-05-14T10:00:00Z",
-        "finishedAt": "2026-05-14T10:02:00Z"
-      }
-    }
-  ]
-}
-```
-
----
-
-### 2. Poll workflow status
-
-Returns the current status of a specific workflow.
+### Poll workflow status
 
 ```bash
-curl -sk "${ARGO}/api/v1/workflows/stress/<workflow-name>" \
+curl -sk "${ARGO}/api/v1/workflows/stress/<name>" \
   -H "Authorization: Bearer ${ARGO_TOKEN}"
 ```
 
-**Response:**
-```json
-{
-  "metadata": {
-    "name": "cpu-ui-abc12"
-  },
-  "status": {
-    "phase": "Running",
-    "startedAt": "2026-05-14T10:00:00Z",
-    "finishedAt": null,
-    "message": ""
-  }
-}
-```
+**Possible phases:** `Pending` · `Running` · `Succeeded` · `Failed` · `Error`
 
-**Possible phases:** `Pending` `Running` `Succeeded` `Failed` `Error`
-
----
-
-### 3. Terminate a workflow
-
-Stops a running workflow immediately. Pods are killed, callback still fires with `status: Failed`.
+### Terminate a workflow
 
 ```bash
 curl -sk -X PUT \
-  "${ARGO}/api/v1/workflows/stress/<workflow-name>/terminate" \
+  "${ARGO}/api/v1/workflows/stress/<name>/terminate" \
   -H "Authorization: Bearer ${ARGO_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
-**Response:**
-```json
-{
-  "metadata": {
-    "name": "cpu-ui-abc12"
-  },
-  "status": {
-    "phase": "Failed",
-    "message": "Stopped with strategy 'Terminate'"
-  }
-}
-```
-
 ---
 
 ## Submit — CPU Stress
-
-Runs stress-ng CPU workers at a configurable load percentage.
-
-**Resource validation:** checks node CPU availability before spawning.
-If validation fails, the stress pod never starts — the workflow fails at the validate step and callback fires with `error.type: bad_params`.
 
 ```bash
 curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
@@ -168,8 +103,6 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
   }'
 ```
 
-### Parameters
-
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `target-node` | `demo` | Worker node hostname |
@@ -181,28 +114,9 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
 | `cpu_lim` | `1` | CPU cores limit for the pod |
 | `callback-url` | `""` | HTTP endpoint to POST results to |
 
-### Submit response
-
-```json
-{
-  "metadata": {
-    "name": "cpu-ui-abc12",
-    "namespace": "stress"
-  },
-  "status": {
-    "phase": "Pending"
-  }
-}
-```
-
 ---
 
 ## Submit — Memory Stress
-
-Allocates and continuously reads/writes memory at a configurable size and rate.
-
-**Resource validation:** checks node memory availability before spawning.
-If validation fails, the stress pod never starts.
 
 ```bash
 curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
@@ -232,32 +146,26 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
   }'
 ```
 
-### Parameters
-
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `target-node` | `demo` | Worker node hostname |
 | `workers` | `1` | Number of memory stress workers |
-| `size` | `0.25` | Memory per worker in GB (e.g. `0.5`, `2`) |
+| `size` | `0.25` | Memory per worker in GB |
 | `timeout` | `1m` | Duration |
-| `read_mbps` | `-1` | Read throttle in MB/s — `-1` means unlimited |
-| `write_mbps` | `-1` | Write throttle in MB/s — `-1` means unlimited |
+| `read_mbps` | `-1` | Read throttle in MB/s — `-1` = unlimited |
+| `write_mbps` | `-1` | Write throttle in MB/s — `-1` = unlimited |
 | `cpuset` | `0` | CPU cores to pin workers to |
 | `cpu_req` | `1` | CPU cores requested |
 | `cpu_lim` | `1` | CPU cores limit |
 | `mem_req` | `1Gi` | Memory requested from k8s scheduler |
-| `mem_lim` | `7Gi` | Memory limit — must be ≥ `workers × size` GB |
+| `mem_lim` | `7Gi` | Memory limit — must be >= workers x size GB |
 | `callback-url` | `""` | HTTP endpoint to POST results to |
 
-> **Note:** `mem_lim` is the pod's hard memory ceiling enforced by k8s. If `workers × size` exceeds `mem_lim`, the pod will be OOMKilled. The resource validator catches this before submission when there is insufficient node memory, but does not validate `mem_lim` vs `size` — that is the caller's responsibility.
+> **Note:** `mem_lim` is enforced by k8s. If `workers x size` exceeds `mem_lim`, the pod is OOMKilled. Recommended: `mem_lim >= workers x size x 1.1`.
 
 ---
 
 ## Submit — IO Stress
-
-Runs fio-based disk IO stress with configurable access pattern and throughput targets.
-
-**No resource validation** — IO uses a pre-provisioned file on the worker node.
 
 ```bash
 curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
@@ -287,17 +195,15 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
   }'
 ```
 
-### Parameters
-
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `target-node` | `demo` | Worker node hostname |
 | `mode` | `seq-read` | IO pattern — `seq-read`, `seq-write`, `rand-read`, `rand-write` |
 | `runtime_sec` | `30` | Duration in seconds |
-| `target_mbps` | `100` | Target throughput in MB/s — leave empty to go unlimited |
-| `target_iops` | `""` | Target IOPS — leave empty to use `target_mbps` instead |
+| `target_mbps` | `100` | Target throughput in MB/s — empty = unlimited |
+| `target_iops` | `""` | Target IOPS — empty = use `target_mbps` instead |
 | `block_size` | `1M` | IO block size (e.g. `4K`, `64K`, `1M`) |
-| `iodepth` | `1` | Queue depth — higher values stress the IO scheduler more |
+| `iodepth` | `1` | Queue depth |
 | `cpu_req` | `1` | CPU cores requested |
 | `cpu_lim` | `1` | CPU cores limit |
 | `mem_req` | `512Mi` | Memory requested |
@@ -308,11 +214,7 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
 
 ## Submit — Network Stress
 
-Runs iperf3 against a target iperf3 server with configurable bandwidth, protocol, and direction.
-
-**No resource validation** — network resources are external to the cluster.
-
-> **Prerequisite:** an iperf3 server must be running on the target host before submitting. Start one with: `iperf3 -s`
+> **Prerequisite:** iperf3 server must be running on the target host: `iperf3 -s`
 
 ```bash
 curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
@@ -341,15 +243,13 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
   }'
 ```
 
-### Parameters
-
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `target-node` | `demo` | Worker node hostname |
-| `server` | `10.255.32.82` | IP of the iperf3 server to connect to |
+| `server` | `10.255.32.82` | IP of the iperf3 server |
 | `bandwidth` | `100` | Target bandwidth in Mbps |
 | `proto` | `tcp` | Protocol — `tcp` or `udp` |
-| `direction` | `upload` | `upload` (client→server) or `download` (server→client) |
+| `direction` | `upload` | `upload` (client to server) or `download` (server to client) |
 | `time` | `20` | Duration in seconds |
 | `cpu_req` | `1` | CPU cores requested |
 | `cpu_lim` | `1` | CPU cores limit |
@@ -359,12 +259,59 @@ curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
 
 ---
 
-## Callback Payload
+## Submit — QuickPizza K6
 
-All modules POST to `callback-url` on completion — whether succeeded or failed.
-The callback fires via the `onExit` handler, so it always runs even if the test crashes.
+Deploys QuickPizza dynamically, runs distributed k6 HTTP load against it, and tears down all resources on completion.
 
-### Success payload
+```bash
+curl -k -X POST "${ARGO}/api/v1/workflows/stress" \
+  -H "Authorization: Bearer ${ARGO_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "workflow": {
+      "metadata": { "generateName": "quickpizza-full-k6-" },
+      "spec": {
+        "workflowTemplateRef": { "name": "quickpizza-full-k6" },
+        "arguments": { "parameters": [
+          { "name": "run_id",       "value": "benchmark-001" },
+          { "name": "target-node",  "value": "demo" },
+          { "name": "base_url",     "value": "http://quickpizza-public-api.stress.svc.cluster.local:3333" },
+          { "name": "max_vusers",   "value": "100" },
+          { "name": "duration",     "value": "30" },
+          { "name": "runner_count", "value": "2" },
+          { "name": "callback-url", "value": "'${CALLBACK}'" }
+        ]}
+      }
+    }
+  }'
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `target-node` | `demo` | Worker node hostname |
+| `run_id` | — | Unique identifier for this execution |
+| `base_url` | — | QuickPizza API endpoint inside the cluster |
+| `max_vusers` | `100` | Maximum concurrent virtual users |
+| `duration` | `30` | Test duration in seconds |
+| `runner_count` | `2` | Number of parallel k6 runner pods |
+| `callback-url` | `""` | HTTP endpoint to POST results to |
+
+### Workflow steps
+
+```
+setup -> wait-ready -> k6-runner -> callback -> teardown
+```
+
+- QuickPizza is deployed and removed automatically — no persistent deployment needed
+- k6 execution is distributed across `runner_count` pods
+
+---
+
+## Callback Payloads
+
+All modules POST to `callback-url` on completion or failure via `onExit`.
+
+### Stress modules — success
 
 ```json
 {
@@ -372,18 +319,13 @@ The callback fires via the `onExit` handler, so it always runs even if the test 
   "status": "Succeeded",
   "test_type": "cpu",
   "error": null,
-  "parameters": {
-    "target": "demo",
-    "workers": "2",
-    "load": "50",
-    "timeout": "1m"
-  },
+  "parameters": { "target": "demo", "workers": "2", "load": "50", "timeout": "1m" },
   "started": "2026-05-14T10:00:00Z",
   "duration": "62.4"
 }
 ```
 
-### Failure payload
+### Stress modules — failure
 
 ```json
 {
@@ -395,38 +337,82 @@ The callback fires via the `onExit` handler, so it always runs even if the test 
     "reason": "OOMKilled",
     "message": "Container killed — memory limit exceeded. Lower size or mem_lim."
   },
-  "parameters": {
-    "target": "demo",
-    "size_gb": "4",
-    "timeout": "1m",
-    "workers": "2"
-  },
+  "parameters": { "target": "demo", "size_gb": "4", "timeout": "1m", "workers": "2" },
   "started": "2026-05-14T10:05:00Z",
   "duration": "8.1"
 }
 ```
 
-### Important — resource validation behaviour
+### QuickPizza K6 — success
 
-The CPU and memory modules run a validation step **before** the stress pod. However:
-
-- Validation only checks **node available capacity vs requested** — it does not validate `mem_lim` vs `size`
-- If the node has enough free memory but `mem_lim` is set lower than what the stress process needs, the pod spawns and then gets OOMKilled
-- The caller is responsible for ensuring `mem_lim ≥ workers × size × 1.1` (10% headroom recommended)
-- Validation failure produces `error.type: bad_params`, not `resource_exhaustion`
+```json
+{
+  "workflow": "quickpizza-full-k6-abc12",
+  "status": "Succeeded",
+  "benchmark": "quickpizza",
+  "target": "demo",
+  "results": {
+    "http_req_duration_avg_ms": 63.95,
+    "http_req_failed_rate": 0,
+    "requests": 523,
+    "throughput_rps": 48.36,
+    "vus_max": 100
+  }
+}
+```
 
 ---
 
 ## Error Type Reference
 
-| `error.type` | `error.reason` | When it fires | Action |
+| `error.type` | `error.reason` | When | Action |
 |---|---|---|---|
-| `resource_exhaustion` | `OOMKilled` | Pod killed by kernel — memory limit hit during run | Lower `size`, `workers`, or raise `mem_lim` |
-| `config_error` | `ImagePullBackOff` | Container image not found or registry unreachable | Check image name and network connectivity from worker node |
-| `config_error` | `CreateContainerConfigError` | Missing volume, secret, or configmap | Check cluster config — hostPath volumes on IO module |
-| `bad_params` | `ExitCode1` | Stress script exited with error — bad parameter values | Check parameter values — invalid `mode`, negative `size`, etc. |
-| `stress_error` | `ExitCode<N>` | Container exited with unexpected non-zero code | Check pod logs for details |
-| `workflow_error` | `NoPodFound` | Workflow failed before any pod was scheduled | Check cluster state — node may be unschedulable or tainted |
+| `resource_exhaustion` | `OOMKilled` | Memory limit hit during run | Lower `size`, `workers`, or raise `mem_lim` |
+| `config_error` | `ImagePullBackOff` | Image not found or registry unreachable | Check image name and worker network |
+| `config_error` | `CreateContainerConfigError` | Missing volume, secret, or configmap | Check cluster config |
+| `bad_params` | `ExitCode1` | Script exited with error — bad parameter values | Check parameter values |
+| `stress_error` | `ExitCode<N>` | Unexpected non-zero exit | Check pod logs |
+| `workflow_error` | `NoPodFound` | Failed before pod was scheduled | Check node schedulability |
+
+---
+
+## Sequence Diagrams
+
+### Stress Test Flow
+
+```mermaid
+sequenceDiagram
+    participant Dashboard
+    participant TestMaster as Test Master
+    participant TestWorker as Test Worker
+
+    Dashboard->>TestMaster: submit curl (workflowTemplateRef + params)
+    Note over TestMaster: Argo schedules workflow
+    TestMaster->>TestWorker: schedule pod
+    TestWorker->>TestWorker: pull image (ghcr.io)
+    Note over TestWorker: runs stress module
+    TestWorker-->>Dashboard: callback POST (status + error)
+    Note over Dashboard: updates Active Tests panel
+```
+
+### QuickPizza K6 Flow
+
+```mermaid
+sequenceDiagram
+    participant Dashboard
+    participant TestMaster as Test Master
+    participant TestWorker as Test Worker
+
+    Dashboard->>TestMaster: submit curl (quickpizza-full-k6 + params)
+    Note over TestMaster: Argo schedules workflow
+    TestMaster->>TestWorker: setup — deploy QuickPizza
+    TestWorker->>TestWorker: wait-ready
+    TestMaster->>TestWorker: schedule k6 runner pods (runner_count)
+    Note over TestWorker: k6 runners send HTTP load to QuickPizza
+    TestMaster->>TestWorker: teardown — remove QuickPizza
+    TestWorker-->>Dashboard: callback POST (http metrics + throughput)
+    Note over Dashboard: renders K6 results panel
+```
 
 ---
 
@@ -437,7 +423,7 @@ The CPU and memory modules run a validation step **before** the stress pod. Howe
 export ARGO="https://10.255.32.82:32746"
 export ARGO_TOKEN=$(kubectl get secret stress-ui-sa-token -n stress \
   -o jsonpath='{.data.token}' | base64 -d)
-export CALLBACK="http://<ui-vm-ip>:3000/api/callback"
+export CALLBACK="http://<ui-vm-ip>:3001/api/callback"
 
 # list all workflows
 curl -sk "${ARGO}/api/v1/workflows/stress" \
@@ -453,7 +439,7 @@ curl -sk -X PUT "${ARGO}/api/v1/workflows/stress/<name>/terminate" \
   -H "Authorization: Bearer ${ARGO_TOKEN}" \
   -H "Content-Type: application/json" -d '{}'
 
-# get workflow name from submit response
+# extract workflow name from submit response
 curl -sk -X POST "${ARGO}/api/v1/workflows/stress" \
   -H "Authorization: Bearer ${ARGO_TOKEN}" \
   -H "Content-Type: application/json" \
