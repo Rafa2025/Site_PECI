@@ -456,53 +456,53 @@
       </div>
     </div>
 
-    <!-- EXTENSIBILITY FUTURES -->
+<!-- EXTENSIBILITY FUTURES -->
     <div class="reveal" style="margin-top:3rem">
-      <p class="section-label">// Future Sources</p>
-      <h2>Extensibility Roadmap</h2>
-      <p class="section-desc">The Telegraf plugin model makes the following sources straightforward additions — each needing only a new pod configuration.</p>
+      <p class="section-label">// Future Work</p>
+      <h2>Roadmap</h2>
+      <p class="section-desc">Six directions for extending the platform beyond the current proof of concept.</p>
     </div>
     <div class="ext-grid reveal">
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>Containers & Microservices</strong>
-          <span>Per-container CPU, memory, and network via Docker or containerd input plugins — workload-level observability independent of the VM.</span>
+          <strong>Intelligent Analysis</strong>
+          <span>Every run is labelled and structured, but the training dataset doesn't exist yet. Next step: dataset formation — defining normal performance and failure ground truth — to enable anomaly detection, degradation prediction, and bottleneck identification.</span>
         </div>
       </div>
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>GPU</strong>
-          <span>Utilisation, memory, temperature, and power draw per card via the nvidia_smi plugin — relevant for ML inference workloads.</span>
+          <strong>Extended Metrics Collection</strong>
+          <span>Containers, GPU, network-attached devices, memory/network latency, and storage (incl. NFS) — each a new container image + WorkflowTemplate via the Telegraf plugin model.</span>
         </div>
       </div>
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>Network-Attached Devices</strong>
-          <span>Interface counters, error rates, and queue statistics from switches and routers via SNMP. Wireless APs via vendor APIs.</span>
+          <strong>Chaos Engineering</strong>
+          <span>Current stress modules apply controlled, parameterised pressure. Real chaos engineering — process kills, network partitions, cascading failures from production profiles — would study failure propagation across dependencies.</span>
         </div>
       </div>
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>Latency</strong>
-          <span>Round-trip and DNS resolution latency via ping and dns_query plugins, complementing the bandwidth metrics already collected.</span>
+          <strong>Security & RBAC</strong>
+          <span>No access control today. Planned: Admin/User roles — admins manage infrastructure config, users submit tests and view results — backed by a persistent user database.</span>
         </div>
       </div>
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>Storage & NFS</strong>
-          <span>NFS mount statistics and distributed storage health for shared storage pools. Disk health via SMART plugin.</span>
+          <strong>Dashboard Analytics</strong>
+          <span>Distribution views, cross-run comparisons, and baseline overlays. Aggregated views across VMs and nodes for cluster-level resource consumption.</span>
         </div>
       </div>
       <div class="ext-item">
         <div class="ext-dot"></div>
         <div>
-          <strong>IoT & Edge</strong>
-          <span>Sensor data from IoT devices via MQTT plugin. Industrial sensors and PLCs via Modbus — common in datacenter power and cooling.</span>
+          <strong>Automation</strong>
+          <span>Ansible playbooks for provisioning new k3s nodes and configuring in-VM agents — latency probes, Scaphandre — tasks that need direct VM access outside the container model.</span>
         </div>
       </div>
     </div>
@@ -695,7 +695,7 @@
   <section id="media">
     <div class="reveal">
       <p class="section-label">// Media</p>
-      <h2>Imagens & Videos</h2>
+      <h2>Images & Videos</h2>
       <p class="section-desc">Visual documentation of the project including dashboard screenshots and recorded demos.</p>
     </div>
     <div class="media-grid reveal">
